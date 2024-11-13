@@ -2,10 +2,12 @@
 name: test
 on:
   pull_request_target: {}
+permissions: {}
 jobs:
   status-check:
     runs-on: ubuntu-24.04
     needs: [skip-ci, foo]
+    timeout-minutes: 10
     if: failure()
     steps:
       - run: exit 1
@@ -13,6 +15,7 @@ jobs:
   skip-ci:
     runs-on: ubuntu-24.04
     if: contains(github.event.issue.labels.*.name, 'skip-ci')
+    timeout-minutes: 10
     steps:
       - run: |
           echo "::error:: The job fails because skip-ci label is being set" >&2
@@ -27,6 +30,7 @@ jobs:
 
   foo:
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     if: |
       !contains(github.event.issue.labels.*.name, 'skip-ci')
     steps:
