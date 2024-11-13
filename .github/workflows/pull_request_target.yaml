@@ -1,0 +1,33 @@
+---
+name: test
+on:
+  pull_request_target: {}
+jobs:
+  status-check:
+    runs-on: ubuntu-24.04
+    needs: [skip-ci, foo]
+    if: failure()
+    steps:
+      - run: exit 1
+
+  skip-ci:
+    runs-on: ubuntu-24.04
+    if: contains(github.event.issue.labels.*.name, 'skip-ci')
+    steps:
+      - run: |
+          echo "::error:: The job fails because skip-ci label is being set" >&2
+          echo "$MESSAGE" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          MESSAGE: |
+            ## CI fails because `skip-ci` label is being set
+
+            Basically, skip CI isn't allowed.
+            To skip CI, you need to get the approval from others and merge this pull request forcibly.
+      - run: exit 1
+
+  foo:
+    runs-on: ubuntu-24.04
+    if: |
+      !contains(github.event.issue.labels.*.name, 'skip-ci')
+    steps:
+      - run: echo foo
